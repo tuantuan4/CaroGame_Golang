@@ -13,5 +13,6 @@ type User struct {
 	Lose     int    `json:"lose"`
 	Draw     int    `json:"draw"`
 
+	//Games []Games
 	Moves []Moves `gorm:"foreignKey:PlayerId"`
 }

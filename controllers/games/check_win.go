@@ -107,14 +107,22 @@ func CheckWin(db *gorm.DB) func(ctx *gin.Context) {
 		// check result
 		idWinner := IsWinner(matrix)
 		ok, id1, id2 := TwoPlayerDraw(matrix, idWinner)
-		if ok {
+		if IsEmpty(matrix) && idWinner < 0 {
+			ctx.JSON(http.StatusOK, gin.H{
+				"message": "continue play",
+			})
+			return
+		}
+		if ok && idWinner < 0 {
 			stringRes := "2 player draw"
-			db.Model(&models.User{}).Where("id = ?", id1).UpdateColumn("win", gorm.Expr("draw + ?", 1))
-			db.Model(&models.User{}).Where("id = ?", id2).UpdateColumn("lose", gorm.Expr("draw + ?", 1))
+			db.Model(&models.User{}).Where("id = ?", id1).UpdateColumn("draw", gorm.Expr("draw + ?", 1))
+			db.Model(&models.User{}).Where("id = ?", id2).UpdateColumn("draw", gorm.Expr("draw + ?", 1))
 			ctx.JSON(200, gin.H{
 				"message": stringRes,
 			})
-		} else if idWinner > 0 {
+			return
+		}
+		if idWinner > 0 {
 			idLoser := PlayerLose(matrix, idWinner)
 			//update bang games
 			db.Model(&models.Games{}).Where("id = ?", idGame).Updates(models.Games{WinnerId: idWinner, LoserId: idLoser})
@@ -123,8 +131,8 @@ func CheckWin(db *gorm.DB) func(ctx *gin.Context) {
 			db.Model(&models.User{}).Where("id = ?", idLoser).UpdateColumn("lose", gorm.Expr("lose + ?", 1))
 
 			ctx.JSON(200, gin.H{
-				"data":    idWinner,
-				"IDLoser": idLoser,
+				"IdWinner": idWinner,
+				"IDLoser":  idLoser,
 			})
 		}
 

@@ -22,11 +22,11 @@ func InitializeRouters(db *gorm.DB) {
 		{
 			game.POST("/CreateGame", games.CreateGame(db))               //done
 			game.POST("/AddMove/:id_game/:id_player", games.AddMove(db)) // done
-			game.GET("/GetGame/:id_game", games.GetGame(db))
-			game.GET("/CheckWin/:id_game", games.CheckWin(db))    //done
-			game.GET("/GetHistory/:id", games.GetHistoryUser(db)) // done
-			game.GET("/gettime/:id", games.GetTime(db))
-			game.GET("/rate/:id", games.HistoryRare(db))
+			game.GET("/GetGame/:id_game", games.GetGame(db))             // done
+			game.GET("/CheckWin/:id_game", games.CheckWin(db))           //done
+			game.GET("/GetHistory/:id", games.GetHistoryUser(db))        // done
+			game.GET("/rate/:id", games.HistoryRare(db))                 // done
+
 		}
 	}
 	r.Run()
