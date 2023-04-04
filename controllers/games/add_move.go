@@ -14,17 +14,11 @@ func AddMove(db *gorm.DB) func(ctx *gin.Context) {
 		idGame, err1 := strconv.Atoi(ctx.Param("id_game"))
 		if err1 != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "falied id game",
+				"error": "failed id game",
 			})
 			return
 		}
-		idPlayer, err2 := strconv.Atoi(ctx.Param("id_player"))
-		if err2 != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "failed id player",
-			})
-			return
-		}
+
 		var move models.Moves
 		err := ctx.BindJSON(&move)
 		if err != nil {
@@ -34,7 +28,6 @@ func AddMove(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 		move.GameId = idGame
-		move.PlayerId = idPlayer
 
 		if err := db.Create(&move).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{

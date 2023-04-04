@@ -69,6 +69,7 @@ func Login(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 		//tra ve ma token
+
 		ctx.JSON(200, gin.H{
 			"token":   tokenString,
 			"message": lib.LOGIN_SUCCESS,

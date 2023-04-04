@@ -36,6 +36,7 @@ func Register(db *gorm.DB) func(ctx *gin.Context) {
 		}
 		user.Password = string(passwordHash)
 		//them thong tin vao db
+		user.RoleID = 1
 		result := db.Create(&user)
 		if result.Error != nil {
 			ctx.JSON(400, gin.H{
@@ -43,6 +44,8 @@ func Register(db *gorm.DB) func(ctx *gin.Context) {
 			})
 			return
 		}
-		ctx.JSON(200, user)
+		ctx.JSON(200, gin.H{
+			"message": "register successful",
+		})
 	}
 }
