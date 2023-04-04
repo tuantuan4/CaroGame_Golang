@@ -18,7 +18,7 @@ func ConnectionDatabase() (db *gorm.DB) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	db.AutoMigrate(models.Token{}, models.Games{}, models.Moves{}, models.Role{}, models.User{})
+	db.AutoMigrate(models.Token{}, models.Moves{}, models.Role{}, models.User{}, models.Games{})
 
 	return db
 }
