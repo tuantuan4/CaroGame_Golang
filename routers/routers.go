@@ -7,8 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitializeRouters(db *gorm.DB) {
-	r := gin.Default()
+func DefineRouter(r *gin.Engine, db *gorm.DB) {
 	v1 := r.Group("/v1")
 	{
 		user := v1.Group("users")
@@ -17,6 +16,7 @@ func InitializeRouters(db *gorm.DB) {
 			user.POST("/login", users.Login(db))
 			user.POST("/logout", users.Logout(db))
 			user.GET("", users.GetAllUsers(db))
+			user.GET("/:id_user", users.GetUserById(db))
 		}
 		game := v1.Group("/games")
 		{
@@ -30,5 +30,10 @@ func InitializeRouters(db *gorm.DB) {
 
 		}
 	}
+}
+
+func InitializeRouters(db *gorm.DB) {
+	r := gin.Default()
+	DefineRouter(r, db)
 	r.Run()
 }

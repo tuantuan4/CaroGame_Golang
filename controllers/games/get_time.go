@@ -1,7 +1,6 @@
 package games
 
 import (
-	"Caro_Game/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -17,21 +16,24 @@ func GetTime(db *gorm.DB) func(ctx *gin.Context) {
 			})
 			return
 		}
-		var game models.Games
-		if err := db.Where("id = ?", id).First(&game).Error; err != nil {
+		//var game models.Games
+		//if err := db.Where("id = ?", id).First(&game).Error; err != nil {
+		//	ctx.JSON(http.StatusBadRequest, gin.H{
+		//		"error": "id not found",
+		//	})
+		//	return
+		//}
+		var sum int64
+		if err1 := db.Table("games").Select("sum(updated_at - created_at)").
+			Where("player_id1 = ?", id).Or("player_id2 = ?", id).
+			Row().Scan(&sum).Error; err1 != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "id not found",
+				"error": "failed to render time",
 			})
 			return
 		}
-		var hour int
-		if err1 := db.Select("id, created_at, updated_at, HOUR(TIMEDIFF(updated_at, created_at)) as hours_diff").Scan(&hour).Error; err1 != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "filed to convert",
-			})
-		}
 		ctx.JSON(200, gin.H{
-			"data": hour,
+			"data": sum,
 		})
 	}
 }

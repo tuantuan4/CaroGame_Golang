@@ -26,7 +26,7 @@ func CreateGame(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"data":    data,
+			"data":    data.ID,
 			"message": "create game is success",
 		})
 

@@ -132,9 +132,8 @@ func CheckWin(db *gorm.DB) func(ctx *gin.Context) {
 
 			ctx.JSON(200, gin.H{
 				"IdWinner": idWinner,
-				"IDLoser":  idLoser,
+				"IdLoser":  idLoser,
 			})
 		}
-
 	}
 }
