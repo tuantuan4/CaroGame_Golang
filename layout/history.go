@@ -1,39 +1,55 @@
 package main
 
 import (
-    "fmt"
+	"encoding/json"
+	"fmt"
+	"net/http"
 
-    "fyne.io/fyne/v2"
-    "fyne.io/fyne/v2/app"
-    "fyne.io/fyne/v2/container"
-    "fyne.io/fyne/v2/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 )
 
+type Game struct {
+	Board    [9]string
+	Winner   string
+	NextTurn string
+}
+
 func main() {
-    myApp := app.New()
+	myApp := app.New()
 
-    myWindow := myApp.NewWindow("Lịch sử trận đấu")
+	historyLabel := widget.NewLabel("")
 
+	historyButton := widget.NewButton("Lịch sử", func() {
+		resp, err := http.Get("http://localhost:8080/v1/games/GetHistory/5")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer resp.Body.Close()
 
-    historyButton := widget.NewButton("Lịch sử", func() {
-		
+		var games []Game
+		err = json.NewDecoder(resp.Body).Decode(&games)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-        myWindow.SetContent(container.NewVBox())
+		historyText := "Lịch sử trò chơi Tic Tac Toe:\n\n"
+		for _, game := range games {
+			historyText += fmt.Sprintf("Winner: %s, NextTurn: %s\n", game.Winner, game.NextTurn)
+			historyText += fmt.Sprintf("Board: %v\n\n", game.Board)
+		}
+		historyLabel.SetText(historyText)
+	})
 
-        for i := 1; i <= 10; i++ {
-            matchButton := widget.NewButton(fmt.Sprintf("Trận đấu %d", i), func() {
-                fmt.Println("Bạn đã chọn trận đấu", i)
-            })
+	content := container.New(layout.NewVBoxLayout(), historyButton, historyLabel)
 
-            myWindow.Content().(*fyne.Container).Add(matchButton)
-        }
-    })
-
-    content := container.NewVBox(
-        historyButton,
-    )
-    myWindow.SetContent(content)
-	myWindow.Resize(fyne.NewSize(400,400))
-
-    myWindow.ShowAndRun()
+	myWindow := myApp.NewWindow("Tic Tac Toe History")
+	myWindow.SetContent(content)
+	myWindow.Resize(fyne.NewSize(400, 400))
+	myWindow.ShowAndRun()
 }
