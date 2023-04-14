@@ -20,13 +20,14 @@ func DefineRouter(r *gin.Engine, db *gorm.DB) {
 		}
 		game := v1.Group("/games")
 		{
-			game.POST("", games.CreateGame(db))                   //done
-			game.POST("/AddMove/:id_game", games.AddMove(db))     // done
-			game.GET("/:id_game", games.GetGame(db))              // done
-			game.GET("/CheckWin/:id_game", games.CheckWin(db))    //done
-			game.GET("/GetHistory/:id", games.GetHistoryUser(db)) // done
-			game.GET("/rate/:id", games.HistoryRare(db))          // done
-			game.GET("/time/:id", games.GetTime(db))              //
+			game.POST("", games.CreateGame(db))                             //done
+			game.POST("/AddMove/:id_game", games.AddMove(db))               // done
+			game.GET("/:id_game", games.GetGame(db))                        // done
+			game.GET("/CheckWin/:id_game", games.CheckWin(db))              //done
+			game.GET("/GetHistory/:id", games.GetHistoryUser(db))           // done
+			game.GET("/rate/:id", games.HistoryRate(db))                    // done
+			game.GET("/time/:id", games.GetTime(db))                        //
+			game.GET("/history/:username", games.HistoryRateByUsername(db)) // done
 
 		}
 	}

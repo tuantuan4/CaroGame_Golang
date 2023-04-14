@@ -16,17 +16,20 @@ func GetTime(db *gorm.DB) func(ctx *gin.Context) {
 			})
 			return
 		}
-		//var game models.Games
-		//if err := db.Where("id = ?", id).First(&game).Error; err != nil {
+
+		var sum float64
+		//if err1 := db.Table("games").Select("sum(updated_at - created_at)").
+		//	Where("player_id1 = ?", id).Or("player_id2 = ?", id).
+		//	Row().Scan(&sum).Error; err1 != nil {
 		//	ctx.JSON(http.StatusBadRequest, gin.H{
-		//		"error": "id not found",
+		//		"error": "failed to render time",
 		//	})
 		//	return
 		//}
-		var sum int64
-		if err1 := db.Table("games").Select("sum(updated_at - created_at)").
-			Where("player_id1 = ?", id).Or("player_id2 = ?", id).
-			Row().Scan(&sum).Error; err1 != nil {
+
+		if err := db.Raw("SELECT SUM(UpdatedAt - CreatedAt) "+
+			"FROM games WHERE player_id1 = ? OR player_id2 = ?", id, id).
+			Row().Scan(&sum).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": "failed to render time",
 			})

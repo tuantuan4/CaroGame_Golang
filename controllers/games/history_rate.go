@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func HistoryRare(db *gorm.DB) func(ctx *gin.Context) {
+func HistoryRate(db *gorm.DB) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
@@ -23,7 +23,7 @@ func HistoryRare(db *gorm.DB) func(ctx *gin.Context) {
 			})
 			return
 		}
-		sum := user.Win + user.Lose + user.Draw
+		sum := float64(user.Win + user.Lose + user.Draw)
 
 		if sum == 0 {
 			ctx.JSON(200, gin.H{
@@ -33,13 +33,14 @@ func HistoryRare(db *gorm.DB) func(ctx *gin.Context) {
 			})
 		} else {
 			var winRate, loseRate, drawRate float64
-			winRate = float64((user.Win / sum) * 100)
-			loseRate = float64((user.Lose / sum) * 100)
-			drawRate = float64((user.Draw / sum) * 100)
+			winRate = float64(user.Win) / sum * 100
+			loseRate = float64(user.Lose) / sum * 100
+			drawRate = float64(user.Draw) / sum * 100
 			ctx.JSON(200, gin.H{
 				"Win":  winRate,
 				"Lose": loseRate,
 				"Draw": drawRate,
+				"Sum":  user.Win + user.Lose + user.Draw,
 			})
 		}
 
