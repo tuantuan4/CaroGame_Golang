@@ -1,6 +1,7 @@
 package games
 
 import (
+	"Caro_Game/common"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -27,16 +28,16 @@ func GetTime(db *gorm.DB) func(ctx *gin.Context) {
 		//	return
 		//}
 
-		if err := db.Raw("SELECT SUM(UpdatedAt - CreatedAt) "+
+		if err := db.Raw("SELECT SUM(updated_at - created_at) "+
 			"FROM games WHERE player_id1 = ? OR player_id2 = ?", id, id).
-			Row().Scan(&sum).Error; err != nil {
+			Scan(&sum).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": "failed to render time",
 			})
 			return
 		}
 		ctx.JSON(200, gin.H{
-			"data": sum,
+			"data": common.ConvertSecondsToHMS(sum),
 		})
 	}
 }
