@@ -28,8 +28,8 @@ func ConvertSecondsToHMS(seconds float64) string {
 
 	// Lấy dư để tính số giây
 	remainingSeconds %= 60
-	result := IntToString(int(hours)) + " giờ " +
-		IntToString(int(minutes)) + " phút " +
-		IntToString(int(remainingSeconds)) + " giây"
+	result := IntToString(hours) + " hour " +
+		IntToString(minutes) + " minute " +
+		IntToString(remainingSeconds) + " second"
 	return result
 }

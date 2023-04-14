@@ -19,14 +19,6 @@ func GetTime(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		var sum float64
-		//if err1 := db.Table("games").Select("sum(updated_at - created_at)").
-		//	Where("player_id1 = ?", id).Or("player_id2 = ?", id).
-		//	Row().Scan(&sum).Error; err1 != nil {
-		//	ctx.JSON(http.StatusBadRequest, gin.H{
-		//		"error": "failed to render time",
-		//	})
-		//	return
-		//}
 
 		if err := db.Raw("SELECT SUM(updated_at - created_at) "+
 			"FROM games WHERE player_id1 = ? OR player_id2 = ?", id, id).
