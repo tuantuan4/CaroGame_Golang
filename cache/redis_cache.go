@@ -6,11 +6,17 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+const (
+	ADDRESS  = "localhost:6379"
+	PASSWORD = ""
+	DATABASE = 0
+)
+
 func CreateRedisClient() (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     ADDRESS,
+		Password: PASSWORD,
+		DB:       DATABASE,
 	})
 	_, err := rdb.Ping(context.Background()).Result()
 	if err != nil {

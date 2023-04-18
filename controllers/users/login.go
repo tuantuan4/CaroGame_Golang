@@ -29,6 +29,7 @@ func generateToken(user models.User) (string, error) {
 	// Ký token với key secret
 	return token.SignedString([]byte("mysecretkey")) // đổi lại key secret thực tế của bạn
 }
+
 func Login(db *gorm.DB, redis *redis.Client) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		var user models.User
@@ -56,7 +57,7 @@ func Login(db *gorm.DB, redis *redis.Client) func(ctx *gin.Context) {
 			return
 		}
 		cache.AddToken(int(existingUser.ID), tokenString, redis)
-
+		ctx.Set("IDUser", int(existingUser.ID))
 		tokenRecord := models.Token{
 			Token:  tokenString,
 			UserID: existingUser.ID,

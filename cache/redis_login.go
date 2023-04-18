@@ -5,8 +5,13 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+const (
+	TIME_EXPIRE = 60 // 60s het han
+)
+
 func AddToken(idUser int, token string, redis *redis.Client) {
 	err := redis.Set(redis.Context(), common.IntToString(idUser), token, 0).Err()
+	redis.Expire(redis.Context(), common.IntToString(idUser), TIME_EXPIRE)
 	if err != nil {
 		return
 	}
