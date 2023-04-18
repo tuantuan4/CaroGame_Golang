@@ -24,6 +24,7 @@ func GetHistoryUser(db *gorm.DB) func(ctx *gin.Context) {
 			})
 			return
 		}
+
 		ctx.JSON(http.StatusOK, gin.H{
 			"username": result.Username,
 			"win":      result.Win,

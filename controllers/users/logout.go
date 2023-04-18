@@ -1,40 +1,48 @@
 package users
 
 import (
-	"Caro_Game/models"
+	"Caro_Game/cache"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/go-redis/redis/v8"
 	"net/http"
+	"strconv"
 )
 
-func Logout(db *gorm.DB) func(ctx *gin.Context) {
+func Logout(redis *redis.Client) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		user, _ := ctx.Get("user")
-		if u, ok := user.(models.User); ok {
-			userID := u.ID
-			tokenString := ctx.GetHeader("Authorization")
-			if tokenString == "" {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": "Authorization header is required",
-				})
-				return
-			}
-			var token models.Token
-			result := db.Where("user_id ? AND token = ?", userID, tokenString).First(&token)
-			if result.Error != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": "Invalid token",
-				})
-			}
-			db.Delete(&token)
-			ctx.JSON(http.StatusOK, gin.H{
-				"message": "Logged out successfully",
+		id, err := strconv.Atoi(ctx.Param("id_user"))
+		if err != nil {
+			ctx.JSON(400, gin.H{
+				"error": err,
 			})
-		} else {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "Failed",
-			})
+			return
 		}
+		tokenString := cache.GetTokenRedis(id, redis)
+		if tokenString == "Error" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": "Authorization header is required",
+			})
+			return
+		}
+		cache.DeleteTokenRedis(id, redis)
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Logged out successfully",
+		})
+		//userID, _ := ctx.Get("UserID")
+
+		//var token models.Token
+		//result := db.Find(&token, "user_id = ? AND token = ?", userID, tokenString)
+		//db.Delete(&result)
+		//afterDeleteStr := ctx.GetHeader("Authorization")
+		//if afterDeleteStr == "" {
+		//	ctx.JSON(http.StatusOK, gin.H{
+		//		"message": "Logged out successfully",
+		//	})
+		//} else {
+		//	ctx.JSON(http.StatusOK, gin.H{
+		//		"message": "Logged out failed",
+		//	})
+		//}
 
 	}
 }

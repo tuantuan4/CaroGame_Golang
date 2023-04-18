@@ -4,18 +4,18 @@ import (
 	"Caro_Game/controllers/games"
 	"Caro_Game/controllers/users"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
-func DefineRouter(r *gin.Engine, db *gorm.DB) {
+func DefineRouter(r *gin.Engine, db *gorm.DB, redis *redis.Client) {
 	v1 := r.Group("/v1")
 	{
 		user := v1.Group("users")
 		{
 			user.POST("/register", users.Register(db))
-			user.POST("/login", users.Login(db))
-			user.POST("/logout", users.Logout(db))
-			user.GET("", users.GetAllUsers(db))
+			user.POST("/login", users.Login(db, redis))
+			user.POST("/logout/:id_user", users.Logout(redis))
 			user.GET("/:id_user", users.GetUserById(db))
 		}
 		game := v1.Group("/games")
@@ -31,11 +31,12 @@ func DefineRouter(r *gin.Engine, db *gorm.DB) {
 			game.GET("/move/:id_game", games.GetMoveByGame(db))
 
 		}
+
 	}
 }
 
-func InitializeRouters(db *gorm.DB) {
+func InitializeRouters(db *gorm.DB, redis *redis.Client) {
 	r := gin.Default()
-	DefineRouter(r, db)
+	DefineRouter(r, db, redis)
 	r.Run()
 }

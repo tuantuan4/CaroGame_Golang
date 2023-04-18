@@ -1,10 +1,12 @@
 package users
 
 import (
+	"Caro_Game/cache"
 	"Caro_Game/lib"
 	"Caro_Game/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"time"
@@ -27,7 +29,7 @@ func generateToken(user models.User) (string, error) {
 	// Ký token với key secret
 	return token.SignedString([]byte("mysecretkey")) // đổi lại key secret thực tế của bạn
 }
-func Login(db *gorm.DB) func(ctx *gin.Context) {
+func Login(db *gorm.DB, redis *redis.Client) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		var user models.User
 		err := ctx.BindJSON(&user)
@@ -48,18 +50,13 @@ func Login(db *gorm.DB) func(ctx *gin.Context) {
 			ctx.JSON(400, gin.H{"error": lib.ACCOUNT_IS_INCORRECT})
 			return
 		}
-		claims := &Claims{
-			UserID: existingUser.ID,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // hết hạn sau 24 giờ
-			},
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString([]byte("mysecretkey")) // đổi lại key secret thực tế của bạn
+		tokenString, err := generateToken(existingUser)
 		if err != nil {
 			ctx.JSON(500, gin.H{"error": lib.TOKEN_ERROR})
 			return
 		}
+		cache.AddToken(int(existingUser.ID), tokenString, redis)
+
 		tokenRecord := models.Token{
 			Token:  tokenString,
 			UserID: existingUser.ID,
