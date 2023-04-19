@@ -3,6 +3,7 @@ package routers
 import (
 	"Caro_Game/controllers/games"
 	"Caro_Game/controllers/users"
+	"Caro_Game/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
@@ -13,13 +14,14 @@ func DefineRouter(r *gin.Engine, db *gorm.DB, redis *redis.Client) {
 	{
 		user := v1.Group("users")
 		{
-			user.POST("/register", users.Register(db))
-			user.POST("/login", users.Login(db, redis))
-			user.POST("/logout/:id_user", users.Logout(redis))
-			user.GET("/:id_user", users.GetUserById(db))
+			user.POST("/register", users.Register(db))   // done
+			user.POST("/login", users.Login(db, redis))  // done
+			user.POST("/logout", users.Logout(redis))    // done
+			user.GET("/:id_user", users.GetUserById(db)) // done
 		}
 		game := v1.Group("/games")
 		{
+			game.Use(middleware.AuthMiddleware(redis))
 			game.POST("", games.CreateGame(db))                             // done
 			game.POST("/AddMove/:id_game", games.AddMove(db))               // done
 			game.GET("/:id_game", games.GetGame(db))                        // done
@@ -28,8 +30,7 @@ func DefineRouter(r *gin.Engine, db *gorm.DB, redis *redis.Client) {
 			game.GET("/rate/:id", games.HistoryRate(db))                    // done
 			game.GET("/time/:id", games.GetTime(db))                        // done
 			game.GET("/history/:username", games.HistoryRateByUsername(db)) // done
-			game.GET("/move/:id_game", games.GetMoveByGame(db))
-
+			game.GET("/move/:id_game", games.GetMoveByGame(db))             // done
 		}
 
 	}
