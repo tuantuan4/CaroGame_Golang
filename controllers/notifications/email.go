@@ -6,5 +6,5 @@ const (
 )
 
 func SendEmail() {
-	//mg := mailgun.NewMailgun(DOMAIN, PRIVATE_API_KEY)
+
 }

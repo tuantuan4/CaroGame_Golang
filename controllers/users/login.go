@@ -57,7 +57,7 @@ func Login(db *gorm.DB, redis *redis.Client) func(ctx *gin.Context) {
 			return
 		}
 		cache.AddToken(int(existingUser.ID), tokenString, redis)
-		ctx.Set("IDUser", int(existingUser.ID))
+		//cache.AddUserRedis(tokenString, existingUser, redis)
 		tokenRecord := models.Token{
 			Token:  tokenString,
 			UserID: existingUser.ID,

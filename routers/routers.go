@@ -2,6 +2,7 @@ package routers
 
 import (
 	"Caro_Game/controllers/games"
+	"Caro_Game/controllers/notifications"
 	"Caro_Game/controllers/users"
 	"Caro_Game/middleware"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ func DefineRouter(r *gin.Engine, db *gorm.DB, redis *redis.Client) {
 			user.POST("/login", users.Login(db, redis))  // done
 			user.POST("/logout", users.Logout(redis))    // done
 			user.GET("/:id_user", users.GetUserById(db)) // done
+			user.GET("", users.GetAllUsers(db))          //done
 		}
 		game := v1.Group("/games")
 		{
@@ -31,6 +33,11 @@ func DefineRouter(r *gin.Engine, db *gorm.DB, redis *redis.Client) {
 			game.GET("/time/:id", games.GetTime(db))                        // done
 			game.GET("/history/:username", games.HistoryRateByUsername(db)) // done
 			game.GET("/move/:id_game", games.GetMoveByGame(db))             // done
+		}
+
+		noti := v1.Group("/notification")
+		{
+			noti.POST("/qrcode", notifications.GenerateQRCode(db))
 		}
 
 	}
